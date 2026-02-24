@@ -3,6 +3,11 @@ Test for the Pager.
 """
 
 import os
+import sys
+
+# Add the project directory to sys.path so we can import 'core'.
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 from core.pager import Pager
 
 def test_pager_write_and_read():
