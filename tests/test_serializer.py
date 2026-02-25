@@ -22,21 +22,21 @@ def test_serializer():
     page_buffer = bytearray(4096)
     
     # Write first row
-    page_buffer[0:len(row_bytes)] = row_bytes
+    page_buffer[0:len(row_bytes)] = row_bytes  # type: ignore
     
     # Write second row right after
     offset = len(row_bytes)
-    page_buffer[offset : offset + len(row2_bytes)] = row2_bytes
+    page_buffer[offset : offset + len(row2_bytes)] = row2_bytes  # type: ignore
     
     # Now read them back in sequence
-    read_row1, consumed1 = deserialize_row(page_buffer[0:])
+    read_row1, consumed1 = deserialize_row(page_buffer[0:])  # type: ignore
     assert read_row1 == row
     
-    read_row2, consumed2 = deserialize_row(page_buffer[consumed1:])
+    read_row2, consumed2 = deserialize_row(page_buffer[consumed1:])  # type: ignore
     assert read_row2 == row2
     
     # Try reading from empty space
-    read_empty, consumed3 = deserialize_row(page_buffer[consumed1 + consumed2:])
+    read_empty, consumed3 = deserialize_row(page_buffer[consumed1 + consumed2:])  # type: ignore
     assert read_empty is None
     assert consumed3 == 0
 
