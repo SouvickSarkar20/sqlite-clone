@@ -58,9 +58,12 @@ class Pager:
         Write a specific page from memory back to the disk.
         """
         if page_num in self.pages:
+            page = self.pages[page_num]
+            assert len(page) == PAGE_SIZE, f"Page {page_num} size is {len(page)}, expected {PAGE_SIZE}"
+            
             offset = page_num * PAGE_SIZE
             self.file.seek(offset)
-            self.file.write(self.pages[page_num])
+            self.file.write(page)
             # Ask the OS to actually write to disk immediately (optional but good)
             self.file.flush()
 
