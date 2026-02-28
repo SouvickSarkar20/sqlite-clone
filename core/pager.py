@@ -21,7 +21,7 @@ class Pager:
             open(filename, "w").close()
             
         self.file = open(filename, "r+b")
-        self.pages = {} # the cache: page_num -> bytes
+        self.pages: dict[int, bytearray] = {} # the cache: page_num -> bytes
 
         # calculate how many pages currently exist in the file
         self.file.seek(0, os.SEEK_END)
