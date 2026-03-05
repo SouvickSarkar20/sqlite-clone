@@ -83,4 +83,6 @@ def query():
         return jsonify({"status": "error", "message": f"Execution Error: {e}", "steps": steps})
 
 if __name__ == "__main__":
-    app.run(debug=True, port=5000)
+    # In production (Render, etc.), the PORT environment variable is provided.
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port, debug=False)

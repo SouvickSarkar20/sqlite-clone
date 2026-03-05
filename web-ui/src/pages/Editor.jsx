@@ -26,7 +26,8 @@ export default function Editor() {
             setSteps([...currentSteps]);
             await new Promise(r => setTimeout(r, 400));
 
-            const response = await fetch('http://localhost:5000/query', {
+            const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+            const response = await fetch(`${API_URL}/query`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ sql: query })
