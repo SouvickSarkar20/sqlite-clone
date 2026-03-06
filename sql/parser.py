@@ -40,7 +40,7 @@ def parse_statement(sql: str) -> dict:
                 elif val.isdigit():
                     values.append(int(val))
                 else:
-                    values.append(val)
+                    values.append(val) # type: ignore
             return {"type": "INSERT", "table": table_name, "values": values}
 
     elif sql.upper().startswith("SELECT"):
