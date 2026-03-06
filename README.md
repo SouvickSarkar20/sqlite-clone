@@ -1,160 +1,100 @@
 # 🗄️ SQLite Clone — A Hand-Built Database Engine
 
-A simple database engine built from scratch in Python, for learning purposes.  
-Type SQL in your browser. Data gets stored in a binary file on disk.  
-No ORMs. No external database libraries. Just code.
+<p align="center">
+  <img src="architecture.png" alt="Architecture Diagram" width="800">
+</p>
+
+A functional, educational database engine built from scratch in Python, featuring a bespoke B-Tree implementation, a custom Lexical SQL Parser, and a modern React (Vite) Frontend. 
+
+Data gets stored in a binary file on disk. No ORMs. No external database libraries. Just code.
 
 ---
 
-## What This Is
+## 🏗️ Architecture & How It Works
 
-This project implements the core ideas behind how SQLite works internally:
+This project implements the core ideas behind how production databases like SQLite work internally:
 
-- **A Pager** — manages reading and writing 4KB pages to/from a `.db` binary file
-- **A Serializer** — converts Python dicts (rows) into bytes and back
-- **A B-Tree** — indexes rows so lookups are fast (O log n, not O n)
-- **A SQL Parser** — reads SQL strings and turns them into structured commands
-- **A Query Executor** — connects the parser output to the right B-Tree operation
-- **A Flask Web UI** — so you can type SQL in a browser and see results
+1. **React (Vite) Frontend**: An interactive UI to execute queries and visualize the engine's step-by-step execution.
+2. **Flask Backend API**: Receives SQL queries and routes them to the database engine.
+3. **Lexical SQL Parser**: Reads raw SQL strings, validates the grammar, and breaks them down into Abstract Syntax Trees (ASTs).
+4. **Query Executor**: The glue layer that takes the AST intent and routes it to the specific B-Tree read/write operations.
+5. **B-Tree Indexing Engine**: Manages the storage structure. Handles node splitting at capacity and ensures O(log n) performance for Primary Key searches.
+6. **Disk Pager & Serializer**: Manages memory-to-disk translation via struct packing. Converts Python dictionaries into 4KB aligned bytes and writes them directly to `test.db`.
 
 ---
 
-## Supported SQL
+## ⚡ Supported SQL
+
+The engine currently robustly supports the core CRUD paradigm:
 
 ```sql
 CREATE TABLE users (id, name, age)
 
-INSERT INTO users VALUES (1, 'alice', 25)
+INSERT INTO users VALUES (1, 'Alice', 25)
 
 SELECT * FROM users
 
 SELECT * FROM users WHERE id = 1
-
-DELETE FROM users WHERE id = 1
 ```
+
+*(Note: `DELETE` operations via a Lazy Deletion strategy are on the roadmap).*
 
 ---
 
-## Project Structure
+## 🛠️ Tech Stack
 
-```
-sqlite-clone/
-│
-├── core/
-│   ├── pager.py        # Reads/writes pages from the .db file
-│   ├── serializer.py   # Converts rows ↔ bytes
-│   ├── btree.py        # B-Tree: insert, search, traverse
-│   └── executor.py     # Runs queries against the right table
-│
-├── sql/
-│   └── parser.py       # Turns SQL string → Python dict
-│
-├── web/
-│   ├── app.py          # Flask server + API endpoint
-│   ├── templates/
-│   │   └── index.html  # The browser UI
-│   └── static/
-│       └── style.css   # Styling
-│
-├── data/
-│   └── mydb.db         # The actual binary database file (created on first run)
-│
-├── tests/              # pytest test suite, one file per module
-├── requirements.txt
-└── README.md
-```
+**Core Engine:**
+- 100% Python 3.11+
+- `struct` module for byte-level memory alignment
+- `pytest` for unit testing the B-Tree and execution layers
+
+**API & Frontend:**
+- Flask & Gunicorn (Backend)
+- React.js + Vite (Frontend)
+- Custom CSS for a premium, interactive "glassmorphic" UI
 
 ---
 
-## How to Run Locally
+## 🚀 Running Locally
 
-**1. Clone the repo**
+### 1. Start the Python Backend
 ```bash
+# Clone the repository
 git clone https://github.com/YOUR_USERNAME/sqlite-clone.git
 cd sqlite-clone
-```
 
-**2. Create a virtual environment**
-```bash
+# Create and activate a virtual environment
 python -m venv venv
 source venv/bin/activate        # Mac/Linux
 venv\Scripts\activate           # Windows
-```
 
-**3. Install dependencies**
-```bash
+# Install dependencies
 pip install -r requirements.txt
-```
 
-**4. Start the server**
-```bash
+# Start the Flask API
 python web/app.py
 ```
 
-**5. Open your browser**
+### 2. Start the Vite React Frontend
+Open a **new terminal window**:
+```bash
+cd sqlite-clone/web-ui
+npm install
+npm run dev
 ```
-http://localhost:5000
-```
+Then open `http://localhost:5173` in your browser.
 
 ---
 
-## How to Run Tests
+## 🧪 Running Core Tests
 
+To verify the integrity of the B-Tree, Parser, and Pager components:
 ```bash
 pytest tests/
 ```
 
 ---
 
-## How It Works — The Flow
+## 📖 Why I Built This
 
-```
-You type SQL in the browser
-        ↓
-Flask receives the string  (web/app.py)
-        ↓
-Parser reads it            (sql/parser.py)   → { type: INSERT, table: users, ... }
-        ↓
-Executor decides what to do (core/executor.py)
-        ↓
-B-Tree finds/stores the row (core/btree.py)
-        ↓
-Serializer converts it      (core/serializer.py) → bytes
-        ↓
-Pager writes to disk        (core/pager.py)
-        ↓
-data/mydb.db  ← your data lives here
-```
-
----
-
-## Build Phases
-
-| Phase | What was built | Status |
-|-------|---------------|--------|
-| 0 | Project skeleton, folder structure, Flask hello world | ✅ Done |
-| 1 | Pager — file I/O and page caching | 🔧 In progress |
-| 2 | Serializer — row ↔ bytes conversion | ⏳ Upcoming |
-| 3 | B-Tree — insert, search, traversal | ⏳ Upcoming |
-| 4 | SQL Parser — string → structured command | ⏳ Upcoming |
-| 5 | Executor — query engine connecting all layers | ⏳ Upcoming |
-| 6 | Web UI — results table, error handling | ⏳ Upcoming |
-| 7 | Deploy to Render | ⏳ Upcoming |
-
----
-
-## Why I Built This
-
-To understand how databases actually work under the hood — not just how to use them.  
-Most developers use databases every day without knowing what happens when you call `INSERT`.  
-This project is my answer to that question.
-
----
-
-## Tech Stack
-
-- **Python 3.11+**
-- **Flask** — web server
-- **struct** — binary serialization
-- **pytest** — testing
-- No database libraries used anywhere.
+I wanted to truly understand how databases actually work under the hood—not just how to query them. Most developers use databases every day without knowing what happens between pressing `Enter` and a record persisting on disk. Building the Lexer, B-Tree, and Pager from scratch demystifies that magic.
